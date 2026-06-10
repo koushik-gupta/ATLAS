@@ -358,27 +358,6 @@ Once the itinerary is finalized, ATLAS will handle the complete booking workflow
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Please open an issue first to discuss what you'd like to change.
-
-```bash
-# Fork the repo, then:
-git checkout -b feature/your-feature-name
-git commit -m "feat: add your feature"
-git push origin feature/your-feature-name
-# Open a Pull Request
-```
-
-### Areas open for contribution
-
-- Adding new LLM provider integrations (OpenAI, Anthropic, Gemini)
-- Expanding transport estimation beyond India
-- Adding more curated destination pitches and city data
-- Improving the OSRM fallback for regions with poor road data
-- Internationalisation (i18n) for non-English trip briefs
-
----
 
 ## 📄 License
 
