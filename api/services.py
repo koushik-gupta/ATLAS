@@ -331,17 +331,24 @@ def sync_run_planning_from_brief(session_id: str, brief: dict, loop: asyncio.Abs
 
         MIN_DAYS_FOR_NEW_HUB = 2
 
+        # If the user already explicitly provided a large list of destinations in the brief
+        # (4 or more cities), treat the selection as finalised — do NOT show the surplus tray
+        # or prompt for more cities. The surplus occurs because many are day-trips from a hub,
+        # which is expected and correct.
+        user_already_curated = len(user_explicit_destinations) >= 4
+
         if is_broad_region:
             previously_selected_cities = []
             city_pitches = deep_research_destinations(reqs.destination_cities, str(original_duration_int), origin)
         else:
-            if remaining_days >= MIN_DAYS_FOR_NEW_HUB:
+            if remaining_days >= MIN_DAYS_FOR_NEW_HUB and not user_already_curated:
                 city_pitches = deep_research_destinations(reqs.destination_cities, str(original_duration_int), origin)
             else:
                 city_pitches = [{"city": c, "pitch": f"Explore {c}"} for c in reqs.destination_cities]
 
         while True:
-            needs_tray = (remaining_days >= MIN_DAYS_FOR_NEW_HUB) or is_broad_region
+            # Only show tray if: broad region (must pick hubs) OR genuine surplus AND user didn't already give many cities
+            needs_tray = (is_broad_region) or (remaining_days >= MIN_DAYS_FOR_NEW_HUB and not user_already_curated)
 
             if needs_tray:
                 if is_broad_region:
@@ -469,8 +476,8 @@ def sync_run_planning_from_brief(session_id: str, brief: dict, loop: asyncio.Abs
                 else:
                     emit("system_event", f"Your selection of {', '.join(reqs.destination_cities)} perfectly fills or exceeds the {original_duration_int}-day itinerary.")
 
-            # --- Feasibility and Pruning Check ---
-            if remaining_days >= MIN_DAYS_FOR_NEW_HUB:
+            # --- Post-selection feasibility: surplus check ---
+            if remaining_days >= MIN_DAYS_FOR_NEW_HUB and not user_already_curated:
                 emit("expand_review", "Extra Time Available",
                      estimated_days=estimated_days,
                      requested_days=original_duration_int,

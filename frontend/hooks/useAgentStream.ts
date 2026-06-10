@@ -137,7 +137,9 @@ export function useAgentStream(sessionId: string | null) {
             transport_class: parsed.transport_class,
           };
           setBriefNodes(prev => [...prev, bn]);
-          setStatusMessage(label);
+          // NOTE: Do NOT update statusMessage here — we want the bottom chip to
+          // keep showing a stable message ("Assembling expedition brief...") rather
+          // than flashing individual brief values like "1 Solo" or "10 Days".
           setCurrentPhase("briefing");
           // Do NOT return here, let it fall through to be added to events array
         }
