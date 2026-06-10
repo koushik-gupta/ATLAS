@@ -1,2 +1,2 @@
 export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://atlas-ssbc.onrender.com";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";

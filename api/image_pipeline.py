@@ -121,7 +121,7 @@ def _get_wikipedia_image(city: str) -> str:
 def _get_duckduckgo_image(city: str) -> str:
     """Fallback to DuckDuckGo image search for obscure cities."""
     try:
-        from duckduckgo_search import DDGS
+        from ddgs import DDGS
         query = f"{city} city landmark travel photography"
         with DDGS() as ddgs:
             results = list(ddgs.images(query, max_results=3))

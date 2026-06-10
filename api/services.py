@@ -544,6 +544,10 @@ def sync_run_planning_from_brief(session_id: str, brief: dict, loop: asyncio.Abs
                 max_hubs = max(2, int(original_duration_int / 3.0))
                 is_overpacked = len(reqs.destination_cities) > max_destinations and len(normalized_hubs) > max_hubs
 
+                # Always initialize original_cities before the pruning block
+                # so it is accessible after the block regardless of whether pruning ran.
+                original_cities = list(reqs.destination_cities)
+
                 if (remaining_days < 0 or is_overpacked) and len(reqs.destination_cities) > 1:
                     if is_overpacked and remaining_days >= 0:
                         emit("system_event", f"Itinerary feels overpacked ({len(reqs.destination_cities)} cities across {len(normalized_hubs)} hubs). Running Feasibility Check...")
@@ -563,7 +567,6 @@ def sync_run_planning_from_brief(session_id: str, brief: dict, loop: asyncio.Abs
                     
                     max_iterations = 3
                     iterations = 0
-                    original_cities = list(reqs.destination_cities)
                     final_reasoning = "Route optimized for feasibility using algorithmic pruning."
                     
                     while remaining_days < 0 or is_overpacked:
