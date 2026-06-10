@@ -463,12 +463,19 @@ def sync_run_planning_from_brief(session_id: str, brief: dict, loop: asyncio.Abs
 
                     reqs.destination_cities = optimize_route_order(origin, reqs.destination_cities)
 
+                    prev_estimated_days = estimated_days  # guard against LLM non-determinism
                     estimated_days, city_roles, is_broad_region = get_ideal_trip_duration(
                         reqs.destination_cities,
                         reqs.pacing or "Moderate",
                         origin
                     )
+                    # CLAMP: adding more cities must NEVER decrease estimated_days
+                    # (LLM can give lower values on re-call due to non-determinism)
+                    estimated_days = max(estimated_days, prev_estimated_days)
                     remaining_days = original_duration_int - estimated_days
+                    # After user confirms from tray during an expand cycle, mark as curated
+                    # so expand_review does NOT fire again with a worse surplus number.
+                    user_already_curated = True
                     break
             else:
                 if remaining_days == 1:
