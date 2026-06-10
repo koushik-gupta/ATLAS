@@ -555,22 +555,30 @@ def synthesize_itinerary(state: TripState, config: RunnableConfig):
             else:
                 excursion_rule = "Limit excursions and prefer dedicated relaxed exploration days within the hub itself."
 
-            local_pacing_rule += (
-                f"\n\nCRITICAL EXCURSION RULE: You MUST allocate full day-trips from {city} to {dt_list}. "
-                f"Weave these excursions naturally into the {nights}-night itinerary for {city}. "
-                f"{excursion_rule} "
-                f"Do not create separate un-dated sections for them. "
-                f"When mentioning an excursion destination like '{day_trips[0]}', you MUST format it in bold (e.g. **{day_trips[0]}**)."
+                f"Limit excursions and prefer dedicated relaxed exploration days within the hub itself."
+
+            # We will append this to selections_block later to make it prominent
+            excursion_rule_block = (
+                f"\n\nCRITICAL EXCURSION RULE (OVERRIDES CLUSTERING):\n"
+                f"You MUST allocate full day-trips from {city} to the following locations: {dt_list}.\n"
+                f"You must dedicate ENTIRE DAYS (or half-days) to these excursion destinations using the 'DAY TRIP CONTEXT' data provided below.\n"
+                f"{excursion_rule} \n"
+                f"Do not let Rule 1 (Geospatial Grouping) prevent you from scheduling these excursions. "
+                f"When mentioning an excursion destination, you MUST format it in bold (e.g. **{day_trips[0]}**)."
             )
             
         selections_block = ""
         if user_selections:
             city_selections = {k: v for k, v in user_selections.items() if city.lower() in k.lower() or k == "transport"}
             if city_selections:
-                selections_block = f"""
+                selections_block += f"""
 USER-SELECTED PREFERENCES (MANDATORY):
 {chr(10).join(f"  - {k}: {v}" for k, v in city_selections.items())}
 You MUST use these specific selections for {city}."""
+
+        # Inject the day-trip excursion override prominently
+        if day_trips:
+            selections_block += excursion_rule_block
 
         is_layover = city in layover_cities
         is_transit_stop = (alloc.role == "TRANSIT_STOP" or is_layover)
