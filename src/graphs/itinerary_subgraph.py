@@ -535,10 +535,12 @@ def synthesize_itinerary(state: TripState, config: RunnableConfig):
                 ct_context = slim_context(tool_contents, ct, pacing=pacing, dynamic_hotel_cap=dynamic_hotel_cap)
                 city_context += f"\n\n--- EN-ROUTE STOP CONTEXT FOR {ct.upper()} ---\n{ct_context}"
 
-            local_pacing_rule += (
-                f"\n\nCRITICAL TRANSIT ABSORPTION RULE: The traveler passes through {ct_list} on the way to {city}. "
-                f"Do NOT create a separate round-trip excursion for these places. "
-                f"Absorb them into the transit / arrival day as en-route sightseeing stops."
+            corridor_rule_block = (
+                f"\n\nCRITICAL TRANSIT ABSORPTION RULE (OVERRIDES ARRIVAL DAY RULES):\n"
+                f"The traveler passes through {ct_list} on the way to {city}.\n"
+                f"You MUST absorb {ct_list} into the transit/arrival day as en-route sightseeing stops.\n"
+                f"Do not let Rule 9 (Arrival Day Rule) prevent you from scheduling these stops on Day 1. "
+                f"When mentioning an en-route stop, you MUST format it in bold (e.g. **{corridor_towns[0]}**)."
             )
 
         day_trips = hub_day_trips.get(city, [])
@@ -579,6 +581,10 @@ You MUST use these specific selections for {city}."""
         # Inject the day-trip excursion override prominently
         if day_trips:
             selections_block += excursion_rule_block
+            
+        # Inject the corridor override prominently
+        if corridor_towns:
+            selections_block += corridor_rule_block
 
         is_layover = city in layover_cities
         is_transit_stop = (alloc.role == "TRANSIT_STOP" or is_layover)
