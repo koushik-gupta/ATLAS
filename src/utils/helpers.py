@@ -140,7 +140,10 @@ def fetch_coordinates_llm_fallback(city_name: str, state_hint: str = "") -> Tupl
         print(f"[WARNING] LLM coordinate extraction failed for {city_name}: {e}")
     return (0.0, 0.0)
 
+_last_nominatim_request = 0.0
+
 def get_city_coordinates(city_name: str) -> Tuple[float, float]:
+    global _last_nominatim_request
     city_clean = city_name.strip().lower()
     if city_clean in _coord_cache:
         return _coord_cache[city_clean]
@@ -165,6 +168,13 @@ def get_city_coordinates(city_name: str) -> Tuple[float, float]:
     }
 
     try:
+        import time
+        now = time.time()
+        time_since_last = now - _last_nominatim_request
+        if time_since_last < 1.1:
+            time.sleep(1.1 - time_since_last)
+            
+        _last_nominatim_request = time.time()
         resp = requests.get(url, params=params, headers=headers, timeout=10)
         resp.raise_for_status()
         data = resp.json()
@@ -174,12 +184,15 @@ def get_city_coordinates(city_name: str) -> Tuple[float, float]:
             lon = float(data[0]["lon"])
             _coord_cache[city_clean] = (lat, lon)
             return lat, lon
+            
+        # If nominatim returned empty data, fallback to LLM
+        return fetch_coordinates_llm_fallback(city_name, hint)
 
     except Exception as e:
-        print(f"[WARNING] Coordinate lookup failed for {city_name}: {e}")
-
-    _coord_cache[city_clean] = (0.0, 0.0)
-    return (0.0, 0.0)
+        print(f"[WARNING] Coordinate lookup failed for {city_name}: {e}. Falling back to LLM.")
+        fallback_coords = fetch_coordinates_llm_fallback(city_name, hint)
+        _coord_cache[city_clean] = fallback_coords
+        return fallback_coords
 
 def get_osrm_matrix(coords: dict[str, tuple[float, float]]) -> dict[str, dict[str, dict]]:
     """
