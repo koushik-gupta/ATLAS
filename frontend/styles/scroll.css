@@ -1,0 +1,31 @@
+/* scroll.css - Scene pacing and scroll layout */
+
+.scene-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Pinning wrappers for GSAP */
+.pin-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+/* Scroll spacer to give GSAP scroll distance */
+.scroll-spacer {
+  height: 300vh; /* Adjust per scene */
+}
+
+/* Absolute center helper */
+.abs-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

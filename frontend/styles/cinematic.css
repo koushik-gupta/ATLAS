@@ -1,0 +1,29 @@
+/* cinematic.css - Shared styles for premium glowing and masking */
+
+.cinematic-glow {
+  box-shadow: 0 0 40px var(--accent-glow);
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.text-gold-glow {
+  text-shadow: 0 0 20px var(--accent-glow);
+  color: var(--accent-gold);
+}
+
+/* Base fade out for items that GSAP will fade in */
+.gsap-reveal {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Glassmorphism for the UI */
+.glass-panel {
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
