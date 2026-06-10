@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { API_URL } from "@/lib/config";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Zap, Coffee, Layers } from "lucide-react";
 import MorphingInput from "./MorphingInput";
@@ -142,7 +143,7 @@ export default function AgentDesk({
     }
 
     try {
-      const res = await fetch(`http://localhost:8000/plan/${sessionId}/feedback`, {
+      const res = await fetch(`${API_URL}/plan/${sessionId}/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ feedback: currentQuery }),

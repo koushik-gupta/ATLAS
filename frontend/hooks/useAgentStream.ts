@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { API_URL } from "@/lib/config";
 import {
   Map, Sun, Train, Home, CheckCircle2, Layers, MessageSquare,
   Scissors, Cloud, Building2, Compass, Cpu, Star, Route,
@@ -73,7 +74,7 @@ export function useAgentStream(sessionId: string | null) {
     if (!sessionId) return;
 
     console.log("Subscribing to session stream:", sessionId);
-    const eventSource = new EventSource(`http://localhost:8000/stream/${sessionId}`);
+    const eventSource = new EventSource(`${API_URL}/stream/${sessionId}`);
 
     // Reset state for new session
     setEvents([]);
@@ -294,7 +295,7 @@ export function useAgentStream(sessionId: string | null) {
       setCurrentReview(null);
       setStatusMessage("Processing your response...");
       try {
-        await fetch(`http://localhost:8000/plan/${sessionId}/answer`, {
+        await fetch(`${API_URL}/plan/${sessionId}/answer`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ answer }),

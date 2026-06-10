@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { API_URL } from "@/lib/config";
 import { AnimatePresence, motion } from "framer-motion";
 import EditorialCanvas from "@/components/dashboard/EditorialCanvas";
 import MapOverlay from "@/components/dashboard/MapOverlay";
@@ -30,7 +31,7 @@ export default function Dashboard() {
   const handleReveal = async () => {
     if (appState === 'completed' || !sessionId) return;
     try {
-      const res = await fetch(`http://localhost:8000/plan/${sessionId}`);
+      const res = await fetch(`${API_URL}/plan/${sessionId}`);
       const data = await res.json();
       setFinalTripData(data.options?.[0] ?? data);
     } catch (err) {
@@ -52,7 +53,7 @@ export default function Dashboard() {
     setBriefData(brief);
     setAppState('assembling');
     try {
-      const res = await fetch("http://localhost:8000/plan/brief", {
+      const res = await fetch(`${API_URL}/plan/brief`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(brief),
